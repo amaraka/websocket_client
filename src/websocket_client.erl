@@ -206,7 +206,7 @@ generate_ws_key() ->
     ok.
 validate_handshake(HandshakeResponse, Key) ->
     Challenge = base64:encode(
-                  crypto:sha(<< Key/binary, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11" >>)),
+                  crypto:hash(sha, << Key/binary, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11" >>)),
     {match, [Challenge]} = re:run(
                              HandshakeResponse,
                              ".*[s|S]ec-[w|W]eb[s|S]ocket-[a|A]ccept: (.*)\\r\\n.*",
