@@ -5,6 +5,11 @@
 -export([
          start_link/0,
          send/4,
+         start_link/1,
+         send_text/2,
+         send_binary/2,
+         send_ping/2,
+         recv/2,
          recv/1,
          stop/1
         ]).
@@ -22,10 +27,22 @@
          }).
 
 start_link() ->
-    websocket_client:start_link("ws://localhost:8080", ?MODULE, []).
+    start_link("ws://localhost:8080").
+
+start_link(Url) ->
+    websocket_client:start_link(Url, ?MODULE, []).
 
 stop(Pid) ->
     Pid ! stop.
+
+send_text(Pid, Msg) ->
+    send(async, Pid, text, Msg).
+
+send_binary(Pid, Msg) ->
+    send(async, Pid, binary, Msg).
+
+send_ping(Pid, Msg) ->
+    send(async, Pid, ping, Msg).
 
 send(async, To, As, What) ->
     websocket_client:async_send(To, {As, What});
@@ -33,9 +50,14 @@ send(sync, To, As, What) ->
     websocket_client:send(To, {As, What}).
 
 recv(Pid) ->
+    recv(Pid, 5000).
+
+recv(Pid, Timeout) ->
     Pid ! {recv, self()},
     receive
         M -> M
+    after
+        Timeout -> error
     end.
 
 init(_, _WSReq) ->
