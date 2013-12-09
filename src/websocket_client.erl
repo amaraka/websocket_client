@@ -144,7 +144,7 @@ ws_client_init(Handler, Protocol, Host, Port, Path, Args, Options) ->
 
 %% @doc Send http upgrade request and validate handshake response challenge
 -spec websocket_handshake(WSReq :: websocket_req:req()) ->
-                                 ok.
+    {ok, binary()}.
 websocket_handshake(WSReq) ->
     [Protocol, Path, Host, Key, Transport, Socket, Options] =
         websocket_req:get([protocol, path, host, key, transport,
@@ -236,7 +236,7 @@ generate_ws_key() ->
 
 %% @doc Validate handshake response challenge
 -spec validate_handshake(HandshakeResponse :: binary(), Key :: binary()) ->
-    {ok, iolist()}.
+    {ok, binary()}.
 validate_handshake(HandshakeResponse, Key) ->
     Challenge = base64:encode(
                   crypto:hash(sha, << Key/binary, "258EAFA5-E914-47DA-95CA-C5AB0DC85B11" >>)),
