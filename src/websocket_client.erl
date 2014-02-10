@@ -149,13 +149,15 @@ websocket_handshake(WSReq) ->
     [Protocol, Path, Host, Key, Transport, Socket, Options] =
         websocket_req:get([protocol, path, host, key, transport,
                            socket, options], WSReq),
+    Origin = [atom_to_binary(Protocol, utf8), <<"://">>, Host],
+
     Handshake = [<<"GET ">>, Path,
                  <<" HTTP/1.1"
                    "\r\nHost: ">>, Host,
                  <<"\r\nUpgrade: WebSocket"
                    "\r\nConnection: Upgrade"
                    "\r\nSec-WebSocket-Key: ">>, Key,
-                 <<"\r\nOrigin: ">>, atom_to_binary(Protocol, utf8), <<"://">>, Host,
+                 <<"\r\nOrigin: ">>, proplists:get_value(origin, Options, Origin),
                  <<"\r\nSec-WebSocket-Protocol: ">>, proplists:get_value(
                                                        ws_protocol, Options, <<"">>),
                  <<"\r\nSec-WebSocket-Version: 13">>,
